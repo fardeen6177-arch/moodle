@@ -31,7 +31,7 @@ class NavDrawer extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Yourname Here',
+                    'Fardeen Shaikh',
                     style: TextStyle(
                       color: moodleWhite,
                       fontWeight: FontWeight.bold,
@@ -39,7 +39,7 @@ class NavDrawer extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'up1234567@myport.ac.uk',
+                    'up2199439@myport.ac.uk',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 12,
@@ -64,7 +64,8 @@ class NavDrawer extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.calendar_month_outlined, color: moodleWhite),
+              leading:
+                  const Icon(Icons.calendar_month_outlined, color: moodleWhite),
               title: const Text(
                 'Calendar',
                 style: TextStyle(color: moodleWhite, fontSize: 16),
@@ -73,7 +74,6 @@ class NavDrawer extends StatelessWidget {
                 // placeholder
               },
             ),
-
             ListTile(
               leading: const Icon(Icons.school_outlined, color: moodleWhite),
               title: const Text(

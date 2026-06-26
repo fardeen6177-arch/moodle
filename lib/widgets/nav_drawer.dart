@@ -9,6 +9,19 @@ class NavDrawer extends StatelessWidget {
     final currentRoute = ModalRoute.of(context)?.settings.name ?? '/';
     final bool isDashboard = currentRoute == '/';
     final bool isCourses = currentRoute == '/courses';
+    final bool isCourseDetails = currentRoute == '/course-details';
+    final bool isProfile = currentRoute == '/profile';
+    final bool isCalendar = currentRoute == '/calendar';
+    final bool isAssessments = currentRoute == '/assessments';
+    final bool isNotifications = currentRoute == '/notifications';
+    final bool isLogin = currentRoute == '/login';
+
+    void goTo(String route) {
+      Navigator.pop(context);
+      if (currentRoute != route) {
+        Navigator.pushReplacementNamed(context, route);
+      }
+    }
 
     return Drawer(
       backgroundColor: moodlePurple,
@@ -56,12 +69,7 @@ class NavDrawer extends StatelessWidget {
               ),
               selected: isDashboard,
               selectedTileColor: Colors.white24,
-              onTap: () {
-                Navigator.pop(context);
-                if (!isDashboard) {
-                  Navigator.pushReplacementNamed(context, '/');
-                }
-              },
+              onTap: () => goTo('/'),
             ),
             ListTile(
               leading:
@@ -70,9 +78,9 @@ class NavDrawer extends StatelessWidget {
                 'Calendar',
                 style: TextStyle(color: moodleWhite, fontSize: 16),
               ),
-              onTap: () {
-                // placeholder
-              },
+              selected: isCalendar,
+              selectedTileColor: Colors.white24,
+              onTap: () => goTo('/calendar'),
             ),
             ListTile(
               leading: const Icon(Icons.school_outlined, color: moodleWhite),
@@ -82,12 +90,59 @@ class NavDrawer extends StatelessWidget {
               ),
               selected: isCourses,
               selectedTileColor: Colors.white24,
-              onTap: () {
-                Navigator.pop(context);
-                if (!isCourses) {
-                  Navigator.pushReplacementNamed(context, '/courses');
-                }
-              },
+              onTap: () => goTo('/courses'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.menu_book_outlined, color: moodleWhite),
+              title: const Text(
+                'Course details',
+                style: TextStyle(color: moodleWhite, fontSize: 16),
+              ),
+              selected: isCourseDetails,
+              selectedTileColor: Colors.white24,
+              onTap: () => goTo('/course-details'),
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.assignment_outlined, color: moodleWhite),
+              title: const Text(
+                'Assessments',
+                style: TextStyle(color: moodleWhite, fontSize: 16),
+              ),
+              selected: isAssessments,
+              selectedTileColor: Colors.white24,
+              onTap: () => goTo('/assessments'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.notifications_none_outlined,
+                  color: moodleWhite),
+              title: const Text(
+                'Notifications',
+                style: TextStyle(color: moodleWhite, fontSize: 16),
+              ),
+              selected: isNotifications,
+              selectedTileColor: Colors.white24,
+              onTap: () => goTo('/notifications'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person_outline, color: moodleWhite),
+              title: const Text(
+                'Profile',
+                style: TextStyle(color: moodleWhite, fontSize: 16),
+              ),
+              selected: isProfile,
+              selectedTileColor: Colors.white24,
+              onTap: () => goTo('/profile'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.login, color: moodleWhite),
+              title: const Text(
+                'Login',
+                style: TextStyle(color: moodleWhite, fontSize: 16),
+              ),
+              selected: isLogin,
+              selectedTileColor: Colors.white24,
+              onTap: () => goTo('/login'),
             ),
           ],
         ),

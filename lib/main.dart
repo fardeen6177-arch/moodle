@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:moodle/views/dashboard_view.dart';
 import 'package:moodle/views/courses_view.dart';
+import 'package:moodle/views/course_details_view.dart';
+import 'package:moodle/views/profile_view.dart';
+import 'package:moodle/views/calendar_view.dart';
+import 'package:moodle/views/assessments_view.dart';
+import 'package:moodle/views/notifications_view.dart';
+import 'package:moodle/views/login_view.dart';
 import 'package:moodle/constants.dart';
 
 void main() {
@@ -27,6 +33,12 @@ class MoodleApp extends StatelessWidget {
       routes: {
         '/': (context) => const DashboardView(),
         '/courses': (context) => const CoursesView(),
+        '/course-details': (context) => const CourseDetailsView(),
+        '/profile': (context) => const ProfileView(),
+        '/calendar': (context) => const CalendarView(),
+        '/assessments': (context) => const AssessmentsView(),
+        '/notifications': (context) => const NotificationsView(),
+        '/login': (context) => const LoginView(),
       },
       debugShowCheckedModeBanner: false,
     );

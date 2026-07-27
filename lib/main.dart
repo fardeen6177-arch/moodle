@@ -1,46 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:moodle/views/dashboard_view.dart';
-import 'package:moodle/views/courses_view.dart';
-import 'package:moodle/views/course_details_view.dart';
-import 'package:moodle/views/profile_view.dart';
-import 'package:moodle/views/calendar_view.dart';
-import 'package:moodle/views/assessments_view.dart';
-import 'package:moodle/views/notifications_view.dart';
-import 'package:moodle/views/login_view.dart';
-import 'package:moodle/constants.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'firebase_options.dart';
+import 'route/app_router.dart';
 
-void main() {
-  runApp(const MoodleApp());
+// Services
+import 'services/auth_service.dart';
+import 'services/firestore_service.dart';
+import 'services/storage_service.dart';
+
+// Repositories
+import 'repositories/auth_repository.dart';
+import 'repositories/course_repository.dart';
+import 'repositories/assignment_repository.dart';
+
+// Providers
+import 'providers/auth_provider.dart';
+import 'providers/course_provider.dart';
+import 'providers/assignment_provider.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // 1. Initialize Services
+  final authService = AuthService();
+  final firestoreService = FirestoreService();
+  final storageService = StorageService();
+
+  // 2. Initialize Repositories
+  final authRepository = AuthRepository(authService, firestoreService);
+  final courseRepository = CourseRepository(firestoreService);
+  final assignmentRepository = AssignmentRepository(firestoreService, storageService);
+
+  // 3. Inject Providers and Run App
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider(authRepository)),
+        ChangeNotifierProvider(create: (_) => CourseProvider(courseRepository)),
+        ChangeNotifierProvider(create: (_) => AssignmentProvider(assignmentRepository)),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
-class MoodleApp extends StatelessWidget {
-  const MoodleApp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Moodle',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: moodlePurple,
-          primary: moodlePurple,
-          secondary: moodleSecondary,
-          surface: moodleSurface,
-        ),
-      ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const DashboardView(),
-        '/courses': (context) => const CoursesView(),
-        '/course-details': (context) => const CourseDetailsView(),
-        '/profile': (context) => const ProfileView(),
-        '/calendar': (context) => const CalendarView(),
-        '/assessments': (context) => const AssessmentsView(),
-        '/notifications': (context) => const NotificationsView(),
-        '/login': (context) => const LoginView(),
-      },
+    return MaterialApp.router(
+      title: 'Moodle Clone',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      routerConfig: AppRouter.router,
     );
   }
 }

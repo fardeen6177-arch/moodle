@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
-import 'package:moodle/main.dart';
+import '../lib/main.dart';
 
 void main() {
   testWidgets('App renders dashboard and courses screen correctly',
@@ -14,7 +14,7 @@ void main() {
     });
 
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MoodleApp());
+    await tester.pumpWidget(MyApp());
 
     // Verify that the dashboard landing content exists.
     expect(find.text('Welcome back, Fardeen'), findsOneWidget);
@@ -40,7 +40,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
 
-    await tester.pumpWidget(const MoodleApp());
+    await tester.pumpWidget(MyApp());
 
     // Navigate to courses via drawer
     await tester.tap(find.byIcon(Icons.menu));
@@ -73,7 +73,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
 
-    await tester.pumpWidget(const MoodleApp());
+    await tester.pumpWidget(MyApp());
 
     // Check for stat cards
     expect(find.text('1 active module'), findsOneWidget);
@@ -99,7 +99,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
 
-    await tester.pumpWidget(const MoodleApp());
+    await tester.pumpWidget(MyApp());
 
     // Open drawer
     await tester.tap(find.byIcon(Icons.menu));

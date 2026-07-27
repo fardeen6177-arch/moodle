@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:moodle/constants.dart';
-import 'package:moodle/widgets/nav_drawer.dart';
+mport 'package:flutter/material.dart';
+import 'package:module_clone/constants.dart';
+import 'package:module_clone/widgets/nav_drawer.dart';
 
 class MoodleScaffold extends StatelessWidget {
   const MoodleScaffold({

@@ -1,4 +1,4 @@
-mport 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:module_clone/constants.dart';
 import 'package:module_clone/widgets/nav_drawer.dart';
 
@@ -27,14 +27,8 @@ class MoodleScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final content = scrollable
-        ? SingleChildScrollView(
-            padding: padding,
-            child: body,
-          )
-        : Padding(
-            padding: padding,
-            child: body,
-          );
+        ? SingleChildScrollView(padding: padding, child: body)
+        : Padding(padding: padding, child: body);
 
     final widthAwareBody = Align(
       alignment: Alignment.topCenter,
@@ -56,10 +50,7 @@ class MoodleScaffold extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               width: 32,
               height: 32,
-              child: Image.asset(
-                'images/moodle_logo.png',
-                fit: BoxFit.contain,
-              ),
+              child: Image.asset('images/moodle_logo.png', fit: BoxFit.contain),
             ),
             Flexible(
               child: Text(
@@ -76,10 +67,7 @@ class MoodleScaffold extends StatelessWidget {
         actions: actions,
       ),
       drawer: showDrawer ? const NavDrawer() : null,
-      body: Container(
-        color: backgroundColor,
-        child: widthAwareBody,
-      ),
+      body: Container(color: backgroundColor, child: widthAwareBody),
     );
   }
 }

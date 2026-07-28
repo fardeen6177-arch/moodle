@@ -50,7 +50,10 @@ class MoodleScaffold extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               width: 32,
               height: 32,
-              child: Image.asset('images/moodle_logo.png', fit: BoxFit.contain),
+              child: Image.asset(
+                'assets/images/moodle_logo.png',
+                fit: BoxFit.contain,
+              ),
             ),
             Flexible(
               child: Text(

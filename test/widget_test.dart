@@ -1,9 +1,13 @@
+import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
+import 'package:module_clone/firebase_options.dart';
 import 'package:module_clone/main.dart';
 import 'package:module_clone/models/assignment_model.dart';
 import 'package:module_clone/models/course_model.dart';
@@ -11,19 +15,117 @@ import 'package:module_clone/models/user_model.dart';
 import 'package:module_clone/providers/assignment_provider.dart';
 import 'package:module_clone/providers/auth_provider.dart';
 import 'package:module_clone/providers/course_provider.dart';
+import 'package:module_clone/repositories/assignment_repository.dart';
+import 'package:module_clone/repositories/auth_repository.dart';
+import 'package:module_clone/repositories/course_repository.dart';
 import 'package:module_clone/route/app_router.dart';
+import 'package:module_clone/services/auth_service.dart';
+import 'package:module_clone/services/firestore_service.dart';
+import 'package:module_clone/services/storage_service.dart';
 import 'package:module_clone/utils/mock_data.dart';
 
-class _FakeAuthProvider extends ChangeNotifier implements AuthProvider {
-  _FakeAuthProvider(this._user);
+class _FakeAuthService extends AuthService {
+  @override
+  Stream<auth.User?> get authStateChanges => Stream.value(null);
 
-  final UserModel _user;
+  @override
+  auth.User? get currentUser => null;
+
+  @override
+  Future<auth.UserCredential> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<auth.UserCredential> registerWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> signOut() async {}
+}
+
+class _FakeFirestoreService extends FirestoreService {
+  @override
+  Stream<List<T>> collectionStream<T>({
+    required String path,
+    required T Function(Map<String, dynamic> data, String documentId) builder,
+  }) {
+    return Stream.value(<T>[]);
+  }
+
+  @override
+  Stream<T> documentStream<T>({
+    required String path,
+    required T Function(Map<String, dynamic>? data, String documentId) builder,
+  }) {
+    return Stream.value(builder(null, ''));
+  }
+}
+
+class _FakeAuthRepository extends AuthRepository {
+  _FakeAuthRepository() : super(_FakeAuthService(), _FakeFirestoreService());
+
+  @override
+  Stream<auth.User?> get authStateChanges => Stream.value(null);
+
+  @override
+  auth.User? get currentUser => null;
+
+  @override
+  Future<UserModel> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    return MockData.currentUser;
+  }
+
+  @override
+  Future<UserModel> registerWithEmailAndPassword(
+    String name,
+    String email,
+    String password,
+  ) async {
+    return MockData.currentUser;
+  }
+
+  @override
+  Future<void> signOut() async {}
+}
+
+class _FakeCourseRepository extends CourseRepository {
+  _FakeCourseRepository() : super(_FakeFirestoreService());
+
+  @override
+  Stream<List<CourseModel>> getAllCourses() {
+    return Stream.value(MockData.courses);
+  }
+}
+
+class _FakeAssignmentRepository extends AssignmentRepository {
+  _FakeAssignmentRepository()
+    : super(_FakeFirestoreService(), StorageService());
+
+  @override
+  Stream<List<AssignmentModel>> getAllAssignments() {
+    return Stream.value(MockData.assignments);
+  }
+}
+
+class _FakeAuthProvider extends AuthProvider {
+  _FakeAuthProvider() : super(_FakeAuthRepository());
 
   @override
   AuthStatus get status => AuthStatus.authenticated;
 
   @override
-  UserModel? get user => _user;
+  UserModel? get user => MockData.currentUser;
 
   @override
   String? get errorMessage => null;
@@ -45,13 +147,11 @@ class _FakeAuthProvider extends ChangeNotifier implements AuthProvider {
   void clearErrors() {}
 }
 
-class _FakeCourseProvider extends ChangeNotifier implements CourseProvider {
-  _FakeCourseProvider(this._courses);
-
-  final List<CourseModel> _courses;
+class _FakeCourseProvider extends CourseProvider {
+  _FakeCourseProvider() : super(_FakeCourseRepository());
 
   @override
-  List<CourseModel> get courses => _courses;
+  List<CourseModel> get courses => MockData.courses;
 
   @override
   bool get isLoading => false;
@@ -62,21 +162,18 @@ class _FakeCourseProvider extends ChangeNotifier implements CourseProvider {
   @override
   List<CourseModel> searchCourses(String query) {
     final lowerQuery = query.toLowerCase();
-    return _courses.where((course) {
+    return MockData.courses.where((course) {
       return course.title.toLowerCase().contains(lowerQuery) ||
           course.courseCode.toLowerCase().contains(lowerQuery);
     }).toList();
   }
 }
 
-class _FakeAssignmentProvider extends ChangeNotifier
-    implements AssignmentProvider {
-  _FakeAssignmentProvider(this._assignments);
-
-  final List<AssignmentModel> _assignments;
+class _FakeAssignmentProvider extends AssignmentProvider {
+  _FakeAssignmentProvider() : super(_FakeAssignmentRepository());
 
   @override
-  List<AssignmentModel> get assignments => _assignments;
+  List<AssignmentModel> get assignments => MockData.assignments;
 
   @override
   bool get isLoading => false;
@@ -89,7 +186,7 @@ class _FakeAssignmentProvider extends ChangeNotifier
 
   @override
   List<AssignmentModel> getAssignmentsForCourse(String courseId) {
-    return _assignments
+    return MockData.assignments
         .where((assignment) => assignment.courseId == courseId)
         .toList();
   }
@@ -108,14 +205,12 @@ class _FakeAssignmentProvider extends ChangeNotifier
 Widget _buildTestApp() {
   return MultiProvider(
     providers: [
-      ChangeNotifierProvider<AuthProvider>(
-        create: (_) => _FakeAuthProvider(MockData.currentUser),
-      ),
+      ChangeNotifierProvider<AuthProvider>(create: (_) => _FakeAuthProvider()),
       ChangeNotifierProvider<CourseProvider>(
-        create: (_) => _FakeCourseProvider(MockData.courses),
+        create: (_) => _FakeCourseProvider(),
       ),
       ChangeNotifierProvider<AssignmentProvider>(
-        create: (_) => _FakeAssignmentProvider(MockData.assignments),
+        create: (_) => _FakeAssignmentProvider(),
       ),
     ],
     child: const MyApp(),
@@ -123,6 +218,9 @@ Widget _buildTestApp() {
 }
 
 Future<void> _pumpTestApp(WidgetTester tester) async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   AppRouter.router.go('/dashboard');
   await tester.pumpWidget(_buildTestApp());
   await tester.pumpAndSettle();

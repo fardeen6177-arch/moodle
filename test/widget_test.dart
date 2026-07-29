@@ -1,126 +1,27 @@
-import 'dart:async';
-import 'dart:typed_data';
-
-import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import 'package:module_clone/firebase_options.dart';
-import 'package:module_clone/main.dart';
 import 'package:module_clone/models/assignment_model.dart';
 import 'package:module_clone/models/course_model.dart';
 import 'package:module_clone/models/user_model.dart';
 import 'package:module_clone/providers/assignment_provider.dart';
 import 'package:module_clone/providers/auth_provider.dart';
 import 'package:module_clone/providers/course_provider.dart';
-import 'package:module_clone/repositories/assignment_repository.dart';
-import 'package:module_clone/repositories/auth_repository.dart';
-import 'package:module_clone/repositories/course_repository.dart';
-import 'package:module_clone/route/app_router.dart';
-import 'package:module_clone/services/auth_service.dart';
-import 'package:module_clone/services/firestore_service.dart';
-import 'package:module_clone/services/storage_service.dart';
+import 'package:module_clone/screens/auth/login_screen.dart';
+import 'package:module_clone/screens/assesments/assessments_view.dart';
+import 'package:module_clone/screens/assesments/assignment_submission_screen.dart';
+import 'package:module_clone/screens/calendar/calendar_view.dart';
+import 'package:module_clone/screens/courses/course_detail_screen.dart';
+import 'package:module_clone/screens/courses/courses_list_screen.dart';
+import 'package:module_clone/screens/dashboard/dashboard_screen.dart';
+import 'package:module_clone/screens/notifications_view.dart';
+import 'package:module_clone/screens/profile/profile_screen.dart';
 import 'package:module_clone/utils/mock_data.dart';
+import 'dart:typed_data';
 
-class _FakeAuthService extends AuthService {
-  @override
-  Stream<auth.User?> get authStateChanges => Stream.value(null);
-
-  @override
-  auth.User? get currentUser => null;
-
-  @override
-  Future<auth.UserCredential> signInWithEmailAndPassword(
-    String email,
-    String password,
-  ) async {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<auth.UserCredential> registerWithEmailAndPassword(
-    String email,
-    String password,
-  ) async {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> signOut() async {}
-}
-
-class _FakeFirestoreService extends FirestoreService {
-  @override
-  Stream<List<T>> collectionStream<T>({
-    required String path,
-    required T Function(Map<String, dynamic> data, String documentId) builder,
-  }) {
-    return Stream.value(<T>[]);
-  }
-
-  @override
-  Stream<T> documentStream<T>({
-    required String path,
-    required T Function(Map<String, dynamic>? data, String documentId) builder,
-  }) {
-    return Stream.value(builder(null, ''));
-  }
-}
-
-class _FakeAuthRepository extends AuthRepository {
-  _FakeAuthRepository() : super(_FakeAuthService(), _FakeFirestoreService());
-
-  @override
-  Stream<auth.User?> get authStateChanges => Stream.value(null);
-
-  @override
-  auth.User? get currentUser => null;
-
-  @override
-  Future<UserModel> signInWithEmailAndPassword(
-    String email,
-    String password,
-  ) async {
-    return MockData.currentUser;
-  }
-
-  @override
-  Future<UserModel> registerWithEmailAndPassword(
-    String name,
-    String email,
-    String password,
-  ) async {
-    return MockData.currentUser;
-  }
-
-  @override
-  Future<void> signOut() async {}
-}
-
-class _FakeCourseRepository extends CourseRepository {
-  _FakeCourseRepository() : super(_FakeFirestoreService());
-
-  @override
-  Stream<List<CourseModel>> getAllCourses() {
-    return Stream.value(MockData.courses);
-  }
-}
-
-class _FakeAssignmentRepository extends AssignmentRepository {
-  _FakeAssignmentRepository()
-    : super(_FakeFirestoreService(), StorageService());
-
-  @override
-  Stream<List<AssignmentModel>> getAllAssignments() {
-    return Stream.value(MockData.assignments);
-  }
-}
-
-class _FakeAuthProvider extends AuthProvider {
-  _FakeAuthProvider() : super(_FakeAuthRepository());
-
+class _FakeAuthProvider extends ChangeNotifier implements AuthProvider {
   @override
   AuthStatus get status => AuthStatus.authenticated;
 
@@ -147,9 +48,7 @@ class _FakeAuthProvider extends AuthProvider {
   void clearErrors() {}
 }
 
-class _FakeCourseProvider extends CourseProvider {
-  _FakeCourseProvider() : super(_FakeCourseRepository());
-
+class _FakeCourseProvider extends ChangeNotifier implements CourseProvider {
   @override
   List<CourseModel> get courses => MockData.courses;
 
@@ -169,9 +68,8 @@ class _FakeCourseProvider extends CourseProvider {
   }
 }
 
-class _FakeAssignmentProvider extends AssignmentProvider {
-  _FakeAssignmentProvider() : super(_FakeAssignmentRepository());
-
+class _FakeAssignmentProvider extends ChangeNotifier
+    implements AssignmentProvider {
   @override
   List<AssignmentModel> get assignments => MockData.assignments;
 
@@ -213,17 +111,68 @@ Widget _buildTestApp() {
         create: (_) => _FakeAssignmentProvider(),
       ),
     ],
-    child: const MyApp(),
+    child: MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      routerConfig: GoRouter(
+        initialLocation: '/dashboard',
+        routes: [
+          GoRoute(
+            path: '/login',
+            builder: (context, state) => const LoginScreen(),
+          ),
+          GoRoute(
+            path: '/dashboard',
+            builder: (context, state) => const DashboardView(),
+          ),
+          GoRoute(
+            path: '/courses',
+            builder: (context, state) => const CoursesListScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                builder: (context, state) {
+                  final courseId = state.pathParameters['id']!;
+                  return CourseDetailsView(courseId: courseId);
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/assignment/:id',
+            builder: (context, state) {
+              final assignmentId = state.pathParameters['id']!;
+              return AssignmentSubmissionScreen(assignmentId: assignmentId);
+            },
+          ),
+          GoRoute(
+            path: '/assessments',
+            builder: (context, state) => const AssessmentsView(),
+          ),
+          GoRoute(
+            path: '/calendar',
+            builder: (context, state) => const CalendarView(),
+          ),
+          GoRoute(
+            path: '/notifications',
+            builder: (context, state) => const NotificationsView(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileView(),
+          ),
+        ],
+      ),
+    ),
   );
 }
 
 Future<void> _pumpTestApp(WidgetTester tester) async {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  AppRouter.router.go('/dashboard');
   await tester.pumpWidget(_buildTestApp());
-  await tester.pumpAndSettle();
+  await tester.pump();
 }
 
 void main() {
@@ -239,19 +188,30 @@ void main() {
     });
 
     await _pumpTestApp(tester);
+    await tester.pump(const Duration(milliseconds: 200));
 
     expect(find.text('Welcome back, Fardeen'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 2),
+    );
 
     await tester.tap(
-      find.descendant(
-        of: find.byType(Drawer),
-        matching: find.text('My Courses'),
-      ),
+      find
+          .descendant(
+            of: find.byType(Drawer),
+            matching: find.text('My Courses'),
+          )
+          .first,
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 2),
+    );
 
     expect(find.text('My Courses'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
@@ -269,26 +229,36 @@ void main() {
     await _pumpTestApp(tester);
 
     await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-    await tester.tap(
-      find.descendant(
-        of: find.byType(Drawer),
-        matching: find.text('My Courses'),
-      ),
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 2),
     );
-    await tester.pumpAndSettle();
+    await tester.tap(
+      find
+          .descendant(
+            of: find.byType(Drawer),
+            matching: find.text('My Courses'),
+          )
+          .first,
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 2),
+    );
 
     final searchField = find.byType(TextField);
     expect(searchField, findsOneWidget);
 
     await tester.enterText(searchField, 'Cloud');
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 200));
 
     expect(find.text('Cloud Computing Architecture'), findsOneWidget);
     expect(find.text('Advanced Mathematics'), findsNothing);
 
     await tester.enterText(searchField, '');
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 200));
     expect(find.text('Advanced Mathematics'), findsOneWidget);
   });
 
@@ -310,7 +280,11 @@ void main() {
     expect(find.text('Profile'), findsOneWidget);
 
     await tester.tap(find.text('Profile').hitTestable());
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 2),
+    );
 
     expect(find.text('Student Profile'), findsOneWidget);
   });
@@ -325,25 +299,42 @@ void main() {
     await _pumpTestApp(tester);
 
     await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 2),
+    );
 
     await tester.tap(
-      find.descendant(of: find.byType(Drawer), matching: find.text('Profile')),
+      find
+          .descendant(of: find.byType(Drawer), matching: find.text('Profile'))
+          .first,
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 2),
+    );
 
     expect(find.text('Student Profile'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 2),
+    );
 
     await tester.tap(
-      find.descendant(
-        of: find.byType(Drawer),
-        matching: find.text('Dashboard'),
-      ),
+      find
+          .descendant(of: find.byType(Drawer), matching: find.text('Dashboard'))
+          .first,
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 2),
+    );
 
     expect(find.text('Welcome back, Fardeen'), findsOneWidget);
   });

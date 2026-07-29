@@ -89,7 +89,7 @@ class ProfileView extends StatelessWidget {
 
                     const SizedBox(height: 8),
 
-                    Text("Student ID : ${user?.id ?? "-"}"),
+                    Text("UP ID : ${user?.id ?? "-"}"),
 
                     const SizedBox(height: 8),
 

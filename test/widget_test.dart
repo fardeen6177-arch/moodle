@@ -190,7 +190,7 @@ void main() {
     await _pumpTestApp(tester);
     await tester.pump(const Duration(milliseconds: 200));
 
-    expect(find.text('Welcome back, Fardeen'), findsOneWidget);
+    expect(find.text('Welcome back, Fardeen Shaikh'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.menu));
     await tester.pumpAndSettle(
@@ -271,7 +271,7 @@ void main() {
 
     await _pumpTestApp(tester);
 
-    expect(find.text('Welcome back, Fardeen'), findsOneWidget);
+    expect(find.text('Welcome back, Fardeen Shaikh'), findsOneWidget);
     expect(find.text('Firebase Connected'), findsOneWidget);
 
     expect(find.text('My Courses'), findsOneWidget);
@@ -336,6 +336,6 @@ void main() {
       const Duration(seconds: 2),
     );
 
-    expect(find.text('Welcome back, Fardeen'), findsOneWidget);
+    expect(find.text('Welcome back, Fardeen Shaikh'), findsOneWidget);
   });
 }

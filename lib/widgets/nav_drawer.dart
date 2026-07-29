@@ -34,9 +34,7 @@ class NavDrawer extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(
-                color: moodleDarkPurple,
-              ),
+              decoration: const BoxDecoration(color: moodleDarkPurple),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -44,11 +42,7 @@ class NavDrawer extends StatelessWidget {
                   const CircleAvatar(
                     radius: 26,
                     backgroundColor: moodleWhite,
-                    child: Icon(
-                      Icons.person,
-                      size: 30,
-                      color: moodlePurple,
-                    ),
+                    child: Icon(Icons.person, size: 30, color: moodlePurple),
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -60,21 +54,19 @@ class NavDrawer extends StatelessWidget {
                     ),
                   ),
                   Text(
+                    'UP ID : ${user?.id ?? "-"}',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                  Text(
                     user?.email ?? "",
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],
               ),
             ),
 
             ListTile(
-              leading: const Icon(
-                Icons.dashboard_outlined,
-                color: moodleWhite,
-              ),
+              leading: const Icon(Icons.dashboard_outlined, color: moodleWhite),
               title: const Text(
                 'Dashboard',
                 style: TextStyle(color: moodleWhite),
@@ -85,10 +77,7 @@ class NavDrawer extends StatelessWidget {
             ),
 
             ListTile(
-              leading: const Icon(
-                Icons.school_outlined,
-                color: moodleWhite,
-              ),
+              leading: const Icon(Icons.school_outlined, color: moodleWhite),
               title: const Text(
                 'My Courses',
                 style: TextStyle(color: moodleWhite),
@@ -141,10 +130,7 @@ class NavDrawer extends StatelessWidget {
             ),
 
             ListTile(
-              leading: const Icon(
-                Icons.person_outline,
-                color: moodleWhite,
-              ),
+              leading: const Icon(Icons.person_outline, color: moodleWhite),
               title: const Text(
                 'Profile',
                 style: TextStyle(color: moodleWhite),
@@ -157,14 +143,8 @@ class NavDrawer extends StatelessWidget {
             const Divider(color: Colors.white30),
 
             ListTile(
-              leading: const Icon(
-                Icons.logout,
-                color: moodleWhite,
-              ),
-              title: const Text(
-                'Logout',
-                style: TextStyle(color: moodleWhite),
-              ),
+              leading: const Icon(Icons.logout, color: moodleWhite),
+              title: const Text('Logout', style: TextStyle(color: moodleWhite)),
               onTap: () async {
                 Navigator.pop(context);
 

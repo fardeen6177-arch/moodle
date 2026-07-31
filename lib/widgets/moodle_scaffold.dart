@@ -10,7 +10,7 @@ class MoodleScaffold extends StatelessWidget {
     this.actions = const [],
     this.backgroundColor = moodleBg,
     this.showDrawer = true,
-    this.padding = const EdgeInsets.all(24.0),
+    this.padding = const EdgeInsets.all(24),
     this.scrollable = true,
     this.maxContentWidth = 960,
   });
@@ -26,19 +26,28 @@ class MoodleScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = scrollable
-        ? SingleChildScrollView(padding: padding, child: body)
-        : Padding(padding: padding, child: body);
-
-    final widthAwareBody = Align(
-      alignment: Alignment.topCenter,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxContentWidth),
-        child: content,
+    Widget content = Padding(
+      padding: padding,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: maxContentWidth,
+          ),
+          child: body,
+        ),
       ),
     );
 
+    if (scrollable) {
+      content = SingleChildScrollView(
+        child: content,
+      );
+    }
+
     return Scaffold(
+      backgroundColor: backgroundColor,
+      drawer: showDrawer ? const NavDrawer() : null,
       appBar: AppBar(
         backgroundColor: moodleWhite,
         foregroundColor: moodleTextDark,
@@ -55,13 +64,13 @@ class MoodleScaffold extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
             ),
-            Flexible(
+            Expanded(
               child: Text(
                 title,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
                   fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -69,8 +78,7 @@ class MoodleScaffold extends StatelessWidget {
         ),
         actions: actions,
       ),
-      drawer: showDrawer ? const NavDrawer() : null,
-      body: Container(color: backgroundColor, child: widthAwareBody),
+      body: content,
     );
   }
 }

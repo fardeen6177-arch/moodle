@@ -6,9 +6,9 @@ import '../models/notification_model.dart';
 
 class MockData {
   static final UserModel currentUser = UserModel(
-    id: '2199439',
-    name: 'Fardeen shaikh',
-    email: 'student@university.edu',
+    id: 'up2199439',
+    name: 'Fardeen Shaikh',
+    email: 'up2199439@myport.ac.uk',
     profileImageUrl: null,
   );
 
@@ -31,6 +31,14 @@ class MockData {
       instructor: 'Prof. S. Gupta',
       progress: 0.40,
     ),
+    CourseModel(
+  id: 'c_004',
+  title: 'Data Structures & Algorithms',
+  courseCode: 'CS502',
+  description: 'Arrays, Linked Lists, Trees, Graphs, and Sorting Algorithms.',
+  instructor: 'Dr. R. Verma',
+  progress: 0.50,
+),
     CourseModel(
       id: 'c_003',
       title: 'Machine Learning & AI',
@@ -89,7 +97,7 @@ class MockData {
       courseId: 'c_002',
       title: 'Hackathon Registration Open',
       content:
-          'Registration for the upcoming 9-hour innovation challenge is now live. Form your teams!',
+          'Registration for the upcoming innovation challenge is now live. Form your teams!',
       datePosted: DateTime.now().subtract(const Duration(days: 1)),
       authorName: 'Prof. S. Gupta',
     ),

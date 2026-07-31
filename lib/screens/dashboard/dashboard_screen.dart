@@ -71,14 +71,14 @@ class DashboardView extends StatelessWidget {
 
       body: Container(
         color: moodleBg,
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// Welcome Section
               Text(
-                "Welcome back, ${user?.name ?? "Student"}",
+                "Welcome back, Fardeen",
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -170,7 +170,7 @@ class DashboardView extends StatelessWidget {
                             ? (constraints.maxWidth - 16) / 2
                             : constraints.maxWidth,
                         icon: Icons.menu_book_outlined,
-                        title: "My Courses",
+                        title: "My courses",
                         subtitle: "Browse all enrolled courses",
                         onTap: () => context.go("/courses"),
                       ),
@@ -222,89 +222,89 @@ class DashboardView extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              Expanded(
-                child: Builder(
-                  builder: (context) {
-                    if (courseProvider.isLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+              Builder(
+                builder: (context) {
+                  if (courseProvider.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                    if (courseProvider.errorMessage != null) {
-                      return Center(
-                        child: Text(
-                          courseProvider.errorMessage!,
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      );
-                    }
-
-                    if (courseProvider.courses.isEmpty) {
-                      return const Center(
-                        child: Text(
-                          "No courses available.",
-                          style: TextStyle(
-                            color: moodleTextMuted,
-                            fontSize: 16,
-                          ),
-                        ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      itemCount: courseProvider.courses.length,
-                      itemBuilder: (context, index) {
-                        final course = courseProvider.courses[index];
-
-                        return Card(
-                          color: moodleWhite,
-                          elevation: 0,
-                          margin: const EdgeInsets.only(bottom: 16),
-                          shape: RoundedRectangleBorder(
-                            side: const BorderSide(color: moodleBorder),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
-                            ),
-                            leading: CircleAvatar(
-                              backgroundColor: moodlePurple,
-                              child: Text(
-                                course.courseCode.substring(0, 2).toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            title: Text(
-                              course.title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: moodleTextDark,
-                              ),
-                            ),
-                            subtitle: Padding(
-                              padding: const EdgeInsets.only(top: 6),
-                              child: Text(
-                                "${course.courseCode} • ${course.instructor}",
-                                style: const TextStyle(color: moodleTextMuted),
-                              ),
-                            ),
-                            trailing: const Icon(
-                              Icons.chevron_right,
-                              color: moodlePurple,
-                            ),
-                            onTap: () {
-                              context.push("/courses/${course.id}");
-                            },
-                          ),
-                        );
-                      },
+                  if (courseProvider.errorMessage != null) {
+                    return Center(
+                      child: Text(
+                        courseProvider.errorMessage!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
                     );
-                  },
-                ),
+                  }
+
+                  if (courseProvider.courses.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "No courses available.",
+                        style: TextStyle(color: moodleTextMuted, fontSize: 16),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: courseProvider.courses.length,
+                    itemBuilder: (context, index) {
+                      final course = courseProvider.courses[index];
+
+                      return Card(
+                        color: moodleWhite,
+                        elevation: 0,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        shape: RoundedRectangleBorder(
+                          side: const BorderSide(color: moodleBorder),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          leading: CircleAvatar(
+                            backgroundColor: moodlePurple,
+                            child: Text(
+                              (course.courseCode.length >= 2
+                                      ? course.courseCode.substring(0, 2)
+                                      : course.courseCode)
+                                  .toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          title: Text(
+                            course.title,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: moodleTextDark,
+                            ),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              "${course.courseCode} • ${course.instructor}",
+                              style: const TextStyle(color: moodleTextMuted),
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.chevron_right,
+                            color: moodlePurple,
+                          ),
+                          onTap: () {
+                            context.push("/courses/${course.id}");
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ],
           ),
